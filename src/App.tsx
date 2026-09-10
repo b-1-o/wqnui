@@ -2,26 +2,51 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import "./App.css";
 
-const REF_BASE = "https://raw.githubusercontent.com/b-1-o/refs/main";
-const MAIN_BG = `${REF_BASE}/more.jpg`;
+const ASSET_BASE = "https://raw.githubusercontent.com/b-1-o/wqnui/main/assets";
+const MUSIC_BASE = "https://raw.githubusercontent.com/b-1-o/wqnui/main/music";
+
+const MAIN_BG = `${ASSET_BASE}/more.jpg`;
 const BG_POOL = [
-  `${REF_BASE}/more.jpg`,
-  `${REF_BASE}/assa.jpg`,
-  `${REF_BASE}/luja.jpg`,
-  `${REF_BASE}/chhc.jpg`,
-  `${REF_BASE}/snow.jpg`,
-  `${REF_BASE}/blfr.jpg`,
+  `${ASSET_BASE}/more.jpg`,
+  `${ASSET_BASE}/assa.jpg`,
+  `${ASSET_BASE}/luja.jpg`,
+  `${ASSET_BASE}/chhc.jpg`,
+  `${ASSET_BASE}/snow.jpg`,
+  `${ASSET_BASE}/blfr.jpg`,
 ];
-const TRACK = `${REF_BASE}/Kai-Angel-lovesong-Official-Music-Video.mp3`;
+const TRACK = `${MUSIC_BASE}/Kai-Angel-lovesong-Official-Music-Video.mp3`;
 const TRACK_NAME = "lovesong";
 const ARTIST = "Kai Angel";
 
 const LINKS = [
-  { label: "TikTok", username: "@psycho_b1o", href: "https://www.tiktok.com/@psycho_b1o", glyph: "♪", image: `${REF_BASE}/kksd.jpg` },
-  { label: "Instagram", username: "@__._saint", href: "https://www.instagram.com/__._saint", glyph: "◎", image: `${REF_BASE}/alal.jpg` },
-  { label: "Music", username: "@blood_on_music", href: "https://t.me/blood_on_music", glyph: "◈", image: `${REF_BASE}/provo.jpg` },
-  { label: "Discord", username: "discord.gg/Rbu3h4US", href: "https://discord.gg/Rbu3h4US", glyph: "◌", image: `${REF_BASE}/anhy.jpg` },
-  { label: "GitHub", username: "b-1-o", href: "https://github.com/b-1-o", glyph: "⌘", image: `${REF_BASE}/snow.jpg` },
+  {
+    label: "TikTok",
+    username: "@wqnui1",
+    href: "https://www.tiktok.com/@wqnui1",
+    glyph: "♪",
+    image: `${ASSET_BASE}/provo.jpg`,
+  },
+  {
+    label: "Telegram",
+    username: "@wqnui",
+    href: "https://t.me/wqnui",
+    glyph: "◈",
+    image: `${ASSET_BASE}/alal.jpg`,
+  },
+  {
+    label: "VK",
+    username: "vk.ru/wqnui",
+    href: "https://vk.ru/wqnui",
+    glyph: "◎",
+    image: `${ASSET_BASE}/anhy.jpg`,
+  },
+  {
+    label: "Discord",
+    username: "discord.gg/Rbu3h4US",
+    href: "https://discord.gg/Rbu3h4US",
+    glyph: "◌",
+    image: `${ASSET_BASE}/snow.jpg`,
+  },
 ];
 
 const LYRICS: { time: number; text: string }[] = [
@@ -192,7 +217,14 @@ function PortalLink({
             <span>{link.username}</span>
             <small>ENTER THE PORTAL</small>
           </div>
-          <a className="portal-go" href={link.href} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} aria-label={`Open ${link.label}`}>
+          <a
+            className="portal-go"
+            href={link.href}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Open ${link.label}`}
+          >
             <Chevron />
           </a>
           <button className="portal-close" onClick={onReset} aria-label={`Close ${link.label}`}>
@@ -226,17 +258,14 @@ export default function App() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const playingRef = useRef(false);
-  const armedRef = useRef<number | null>(null);
-
-  useEffect(() => { playingRef.current = playing; }, [playing]);
-  useEffect(() => { armedRef.current = armedLink; }, [armedLink]);
 
   const setupAudio = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     if (!audioContextRef.current) {
-      const Ctor = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      const Ctor =
+        window.AudioContext ||
+        (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!Ctor) return;
       const ctx = new Ctor();
       const node = ctx.createAnalyser();
@@ -251,7 +280,9 @@ export default function App() {
       try {
         sourceRef.current = audioContextRef.current!.createMediaElementSource(audio);
         sourceRef.current.connect(analyserRef.current!);
-      } catch { /* already connected */ }
+      } catch {
+        /* already connected */
+      }
     }
     if (audioContextRef.current.state === "suspended") void audioContextRef.current.resume();
   }, []);
@@ -271,7 +302,10 @@ export default function App() {
       setProgress(audio.duration ? audio.currentTime / audio.duration : 0);
     };
     const onMeta = () => setDuration(audio.duration || 0);
-    const onEnded = () => { setPlaying(false); setLyricsOpen(false); };
+    const onEnded = () => {
+      setPlaying(false);
+      setLyricsOpen(false);
+    };
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
 
@@ -306,10 +340,13 @@ export default function App() {
     if (!audio) return;
     setupAudio();
     if (audio.paused) {
-      void audio.play().then(() => {
-        setPlaying(true);
-        setLyricsOpen(true);
-      }).catch(() => setPlaying(false));
+      void audio
+        .play()
+        .then(() => {
+          setPlaying(true);
+          setLyricsOpen(true);
+        })
+        .catch(() => setPlaying(false));
     } else {
       audio.pause();
       setPlaying(false);
@@ -334,7 +371,8 @@ export default function App() {
   }, [currentTime]);
 
   const activeLyric = activeLyricIndex >= 0 ? LYRICS[activeLyricIndex] : null;
-  const nextLyric = activeLyricIndex >= 0 && activeLyricIndex + 1 < LYRICS.length ? LYRICS[activeLyricIndex + 1] : null;
+  const nextLyric =
+    activeLyricIndex >= 0 && activeLyricIndex + 1 < LYRICS.length ? LYRICS[activeLyricIndex + 1] : null;
 
   const expanded = playing || lyricsOpen;
 
@@ -369,7 +407,10 @@ export default function App() {
 
           <div className="player-expanded">
             <div className="player-header">
-              <span className="live-indicator"><i />{playing ? "live" : "idle"}</span>
+              <span className="live-indicator">
+                <i />
+                {playing ? "live" : "idle"}
+              </span>
               <span className="track-count">01 / 01</span>
             </div>
 
@@ -396,12 +437,23 @@ export default function App() {
             </div>
 
             <div className="player-controls">
-              <button className="control-button" aria-label="Shuffle" disabled><ShuffleIcon /></button>
-              <button className="control-button" aria-label="Previous" disabled><Chevron direction="left" /></button>
-              <motion.button className="play-button" onClick={togglePlay} whileTap={{ scale: 0.92 }} aria-label={playing ? "Pause" : "Play"}>
+              <button className="control-button" aria-label="Shuffle" disabled>
+                <ShuffleIcon />
+              </button>
+              <button className="control-button" aria-label="Previous" disabled>
+                <Chevron direction="left" />
+              </button>
+              <motion.button
+                className="play-button"
+                onClick={togglePlay}
+                whileTap={{ scale: 0.92 }}
+                aria-label={playing ? "Pause" : "Play"}
+              >
                 <PlayIcon playing={playing} />
               </motion.button>
-              <button className="control-button" aria-label="Next" disabled><Chevron /></button>
+              <button className="control-button" aria-label="Next" disabled>
+                <Chevron />
+              </button>
             </div>
 
             <div className="progress-track" onPointerDown={seek} role="slider" aria-label="Track progress">
@@ -410,7 +462,9 @@ export default function App() {
             </div>
 
             <div className="time-row">
-              <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
+              <span>
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
               <button type="button" onClick={() => setLyricsOpen((v) => !v)}>
                 {lyricsOpen ? "COLLAPSE" : "LYRICS"}
               </button>
@@ -422,7 +476,10 @@ export default function App() {
                   const isActive = i === activeLyricIndex;
                   const isPast = i < activeLyricIndex;
                   return (
-                    <div key={`${line.time}-${i}`} className={`lyric-line ${isActive ? "active" : ""} ${isPast ? "past" : ""}`}>
+                    <div
+                      key={`${line.time}-${i}`}
+                      className={`lyric-line ${isActive ? "active" : ""} ${isPast ? "past" : ""}`}
+                    >
                       {line.text}
                     </div>
                   );
@@ -450,7 +507,10 @@ export default function App() {
           className="links"
           initial="hidden"
           animate="show"
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.055, delayChildren: 0.2 } } }}
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.055, delayChildren: 0.2 } },
+          }}
         >
           {LINKS.map((link, index) => (
             <motion.div
@@ -458,12 +518,22 @@ export default function App() {
               className={`link-row ${armedLink === index ? "active-row" : ""}`}
               variants={{ hidden: { opacity: 1 }, show: { opacity: 1 } }}
             >
-              <PortalLink link={link} armed={armedLink === index} onArm={() => setArmedLink(index)} onReset={() => setArmedLink(null)} />
+              <PortalLink
+                link={link}
+                armed={armedLink === index}
+                onArm={() => setArmedLink(index)}
+                onReset={() => setArmedLink(null)}
+              />
             </motion.div>
           ))}
         </motion.nav>
 
-        <motion.footer className="footer" initial={{ opacity: 0 }} animate={{ opacity: 0.42 }} transition={{ delay: 0.7, duration: 0.5 }}>
+        <motion.footer
+          className="footer"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.42 }}
+          transition={{ delay: 0.7, duration: 0.5 }}
+        >
           wqnui · blue glass
         </motion.footer>
       </main>
