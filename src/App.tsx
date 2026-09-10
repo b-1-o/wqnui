@@ -1,102 +1,40 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
-import './App.css'
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import "./App.css";
 
-const REF = 'https://raw.githubusercontent.com/b-1-o/refs/main'
-const images = ['more.jpg', 'assa.jpg', 'luja.jpg', 'chhc.jpg', 'snow.jpg', 'blfr.jpg']
-const buttons = [
-  { name: 'kksd', label: '01' },
-  { name: 'alal', label: '02' },
-  { name: 'provo', label: '03' },
-  { name: 'anhy', label: '04' },
-]
-const tracks = [{ title: 'lovesong', artist: 'Kai Angel', src: `${REF}/Kai-Angel-lovesong-Official-Music-Video.mp3` }]
-const links = [
-  { title: 'Discord', sub: 'Rbu3h4US', href: 'https://discord.gg/Rbu3h4US', image: `${REF}/kksd.jpg` },
-  { title: 'GitHub', sub: 'b-1-o', href: 'https://github.com/b-1-o', image: `${REF}/alal.jpg` },
-]
+const REF_BASE = "https://raw.githubusercontent.com/b-1-o/refs/main";
+const IMAGES = ["more.jpg", "assa.jpg", "luja.jpg", "chhc.jpg", "snow.jpg", "blfr.jpg"];
+const BUTTONS = ["kksd.jpg", "alal.jpg", "provo.jpg", "anhy.jpg"];
+const TRACK = `${REF_BASE}/Kai-Angel-lovesong-Official-Music-Video.mp3`;
+const LINKS = [
+  { label: "TikTok", username: "@psycho_b1o", href: "https://www.tiktok.com/@psycho_b1o", image: `${REF_BASE}/kksd.jpg`, glyph: "♪" },
+  { label: "Instagram", username: "@__._saint", href: "https://www.instagram.com/__._saint", image: `${REF_BASE}/alal.jpg`, glyph: "◎" },
+  { label: "Music", username: "@blood_on_music", href: "https://t.me/blood_on_music", image: `${REF_BASE}/provo.jpg`, glyph: "◈" },
+  { label: "Discord", username: "Rbu3h4US", href: "https://discord.gg/Rbu3h4US", image: `${REF_BASE}/anhy.jpg`, glyph: "◌" },
+  { label: "GitHub", username: "b-1-o", href: "https://github.com/b-1-o", image: `${REF_BASE}/snow.jpg`, glyph: "⌘" },
+];
+// Add your own licensed lyrics here. The player already handles timestamp syncing.
+const LYRICS: { time: number; text: string }[] = [];
 
-function PlayIcon({ playing }: { playing: boolean }) {
-  return playing ? <svg viewBox="0 0 24 24"><path d="M7 5h4v14H7zm6 0h4v14h-4z" /></svg> : <svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z" /></svg>
-}
-
-function Visualizer({ playing }: { playing: boolean }) {
-  return <div className={`visualizer ${playing ? 'active' : ''}`}>{Array.from({ length: 26 }, (_, i) => <i key={i} style={{ '--i': i } as React.CSSProperties} />)}</div>
-}
+function PlayIcon({ playing }: { playing: boolean }) { return playing ? <svg viewBox="0 0 24 24"><path d="M7.5 5.5h3v13h-3zm6 0h3v13h-3z" /></svg> : <svg viewBox="0 0 24 24"><path d="m8.5 5.8 10 6.2-10 6.2z" /></svg>; }
+function Chevron({ left = false }: { left?: boolean }) { return <svg viewBox="0 0 24 24"><path d={left ? "m15 5-7 7 7 7" : "m9 5 7 7-7 7"} /></svg>; }
+function ShuffleIcon() { return <svg viewBox="0 0 24 24"><path d="M4 7h2.2c2.4 0 3.8 1.8 5.1 5s2.7 5 5.2 5H20m-3-3 3 3-3 3M4 17h2.2c1.6 0 2.8-.8 3.8-2.1M14.3 9.1C15.5 7.7 16.5 7 18 7H20m-3-3 3 3-3 3" /></svg>; }
+function Visualizer({ playing }: { playing: boolean }) { return <div className="visualizer">{Array.from({ length: 24 }, (_, i) => <i key={i} style={{ "--i": i } as React.CSSProperties} />)}</div>; }
+function PortalLink({ link, armed, onArm, onReset }: { link: (typeof LINKS)[number]; armed: boolean; onArm: () => void; onReset: () => void }) { return <div className={`portal-shell ${armed ? "armed" : ""}`}><div className="portal-card glass" onPointerDown={e => e.stopPropagation()}><div className="portal-face"><span className="portal-glyph">{link.glyph}</span><span className="portal-label">{link.label}</span><span className="portal-orbit">↗</span></div><div className="portal-open"><div className="social-art"><img src={link.image} alt="" /><span className="social-art-shine" /></div><div className="portal-copy"><strong>{link.label}</strong><span>{link.username}</span><small>ENTER THE PORTAL</small></div><a className="portal-go" href={link.href} target="_blank" rel="noreferrer"><Chevron /></a><button className="portal-close" onClick={onReset}>×</button></div>{!armed && <button className="portal-hit" onClick={onArm} aria-label={`Open ${link.label}`} />}</div></div>; }
 
 export default function App() {
-  const audio = useRef<HTMLAudioElement>(null)
-  const [playing, setPlaying] = useState(false)
-  const [expanded, setExpanded] = useState(false)
-  const [time, setTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [image, setImage] = useState(0)
-  const [armed, setArmed] = useState<number | null>(null)
-  const track = tracks[0]
-  const progress = duration ? time / duration : 0
-
-  useEffect(() => {
-    const a = audio.current
-    if (!a) return
-    const tick = () => setTime(a.currentTime)
-    const loaded = () => setDuration(a.duration || 0)
-    const ended = () => setPlaying(false)
-    a.addEventListener('timeupdate', tick)
-    a.addEventListener('loadedmetadata', loaded)
-    a.addEventListener('ended', ended)
-    return () => { a.removeEventListener('timeupdate', tick); a.removeEventListener('loadedmetadata', loaded); a.removeEventListener('ended', ended) }
-  }, [])
-
-  const toggle = () => {
-    const a = audio.current
-    if (!a) return
-    if (a.paused) { void a.play().then(() => { setPlaying(true); setExpanded(true) }).catch(() => setPlaying(false)) }
-    else { a.pause(); setPlaying(false) }
-  }
-
-  const seek = (value: number) => {
-    const a = audio.current
-    if (!a || !duration) return
-    a.currentTime = value * duration
-    setTime(a.currentTime)
-  }
-
-  const formatted = useMemo(() => {
-    const f = (n: number) => `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, '0')}`
-    return `${f(time)} / ${f(duration)}`
-  }, [time, duration])
-
-  return <div className="app" onClick={() => armed !== null && setArmed(null)}>
-    <div className="bg"><div className="fog one" /><div className="fog two" /><div className="vignette" /></div>
-    <main className="page">
-      <motion.header className="identity" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .7 }}>
-        <span className="mark">wqnui</span><span className="handle">blue glass / b-1-o</span>
-      </motion.header>
-
-      <section className={`hero glass ${playing ? 'playing' : ''}`}>
-        <div className="hero-glow" />
-        <div className="orbit">{images.map((name, i) => <img key={name} src={`${REF}/${name}`} alt="" style={{ '--i': i } as React.CSSProperties} />)}</div>
-        <motion.div className="hero-core" animate={{ rotate: playing ? 4 : -4, scale: playing ? 1.035 : 1 }} transition={{ duration: .7 }}>
-          <img src={`${REF}/${images[image]}`} alt="" />
-        </motion.div>
-        <div className="hero-title"><small>b-1-o</small><h1>wqnui</h1><p>blue fog · translucent glass · rotating memories</p></div>
-      </section>
-
-      <section className={`player glass ${expanded ? 'expanded' : ''}`}>
-        <audio ref={audio} src={track.src} preload="metadata" />
-        <div className="player-top">
-          <button className="play" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}><PlayIcon playing={playing} /></button>
-          <div><div className="track-title">{track.title}</div><div className="track-sub">{track.artist} · official music video</div></div>
-          <button className="expand" onClick={() => setExpanded(v => !v)}>{expanded ? '×' : '↗'}</button>
-        </div>
-        <Visualizer playing={playing} />
-        <div className="progress-row"><span>{formatted}</span><input aria-label="Progress" type="range" min="0" max="1" step="0.001" value={progress} onChange={e => seek(Number(e.target.value))} /></div>
-        <div className="lyrics"><div className="lyrics-title">LYRICS</div><div className="lyric active">Synced lyrics ready</div><div className="lyric-note">Add your licensed lyrics to the lyric data to display them here in sync with the track.</div></div>
-      </section>
-
-      <section className="buttons">{buttons.map((b, i) => <button key={b.name} className="image-button" onClick={() => setImage(i % images.length)}><img src={`${REF}/${b.name}.jpg`} alt="" /><span>{b.label}</span></button>)}</section>
-      <section className="links">{links.map((link, i) => <div key={link.title} className={`portal ${armed === i ? 'armed' : ''}`} onClick={e => e.stopPropagation()}><div className="portal-face"><img src={link.image} alt="" /><span>{link.title}</span><small>{link.sub}</small><button onClick={() => setArmed(i)}>↗</button></div>{armed === i && <a className="portal-open" href={link.href} target="_blank" rel="noreferrer"><span>ENTER PORTAL</span> →</a>}</div>)}</section>
-      <footer>made with react · typescript · framer motion</footer>
-    </main>
-  </div>
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [track] = useState(0); const [playing, setPlaying] = useState(false); const [expanded, setExpanded] = useState(false); const [time, setTime] = useState(0); const [duration, setDuration] = useState(0); const [armedLink, setArmedLink] = useState<number | null>(null); const [image, setImage] = useState(0);
+  useEffect(() => { const a = audioRef.current; if (!a) return; const tick = () => setTime(a.currentTime); const loaded = () => setDuration(a.duration || 0); const ended = () => setPlaying(false); a.addEventListener("timeupdate", tick); a.addEventListener("loadedmetadata", loaded); a.addEventListener("ended", ended); return () => { a.removeEventListener("timeupdate", tick); a.removeEventListener("loadedmetadata", loaded); a.removeEventListener("ended", ended); }; }, []);
+  const togglePlay = () => { const a = audioRef.current; if (!a) return; if (a.paused) void a.play().then(() => { setPlaying(true); setExpanded(true); }).catch(() => setPlaying(false)); else { a.pause(); setPlaying(false); } };
+  const seek = (e: React.PointerEvent<HTMLDivElement>) => { const a = audioRef.current; if (!a?.duration) return; const r = e.currentTarget.getBoundingClientRect(); a.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * a.duration; };
+  const formatted = useMemo(() => { const f = (n: number) => `${Math.floor(n / 60)}:${String(Math.floor(n % 60)).padStart(2, "0")}`; return `${f(time)} / ${f(duration)}`; }, [time, duration]);
+  const activeLyric = [...LYRICS].reverse().find(line => time >= line.time);
+  return <div className="app" onPointerDown={() => armedLink !== null && setArmedLink(null)}><div className="background"><div className="background-fog fog-a" /><div className="background-fog fog-b" /><div className="background-vignette" /></div><main className={`page ${armedLink !== null ? "portal-open-page" : ""}`}>
+    <motion.header className="identity" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .6, ease: [0.22, 1, 0.36, 1] }}><span className="identity-mark">b-1-o</span><span className="identity-name">psycho_b1o</span></motion.header>
+    <section className={`player glass ${playing ? "playing" : ""} ${armedLink !== null ? "collapsed" : ""}`}><audio ref={audioRef} src={TRACK} preload="metadata" /><div className="player-collapsed"><button className="mini-play" onClick={togglePlay}><PlayIcon playing={playing} /></button><div className="mini-track"><span>lovesong</span><i style={{ transform: `scaleX(${duration ? time / duration : 0})` }} /></div><span className="mini-index">01</span></div><div className="player-expanded"><div className="player-header"><span className="live-indicator"><i />{playing ? "live" : "idle"}</span><span className="track-count">01 / 01</span></div><div className="visual-stage"><div className="visual-aura" /><Visualizer playing={playing} /><div className="visual-ring ring-one" /><div className="visual-ring ring-two" /><div className="visual-ring ring-three" /><motion.div className="glass-core" animate={{ rotate: playing ? 405 : 45 }} transition={{ duration: 1.4, ease: "easeInOut" }}><div className="core-reflection" /><div className="core-pulse" /><div className="core-line" /></motion.div></div><div className="track-meta"><strong>lovesong</strong><span>Kai Angel</span></div><div className="player-controls"><button className="control-button" aria-label="Previous"><Chevron left /></button><button className="control-button" aria-label="Shuffle"><ShuffleIcon /></button><button className="play-button" onClick={togglePlay}><PlayIcon playing={playing} /></button><button className="control-button" aria-label="Next"><Chevron /></button></div><div className="progress-track" onPointerDown={seek}><div className="progress-fill" style={{ transform: `scaleX(${duration ? time / duration : 0})` }} /><div className="progress-thumb" style={{ left: `${duration ? time / duration * 100 : 0}%` }} /></div><div className="time-row"><span>{formatted}</span><button onClick={() => setExpanded(v => !v)}>{expanded ? "COLLAPSE" : "LYRICS"}</button></div><div className={`lyrics ${expanded ? "lyrics-visible" : ""}`}><div className="lyrics-title">LYRICS</div><div className="lyric active">{activeLyric?.text || "Synced lyrics ready"}</div><div className="lyric-note">Timestamp syncing is ready. Add your licensed lyric lines to the LYRICS array.</div></div></div></section>
+    <section className="links-grid">{BUTTONS.map((src, i) => <button key={src} className="image-button" onClick={() => setImage(i % IMAGES.length)}><img src={`${REF_BASE}/${src}`} alt="" /><span>0{i + 1}</span></button>)}</section>
+    <section className="links">{LINKS.map((link, i) => <PortalLink key={link.label} link={link} armed={armedLink === i} onArm={() => setArmedLink(i)} onReset={() => setArmedLink(null)} />)}</section>
+    <AnimatePresence mode="wait"><motion.div className="selected-memory" key={image} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: .3 }}>{IMAGES[image]}</motion.div></AnimatePresence><footer>made with react · typescript · framer motion</footer>
+  </main></div>;
 }
