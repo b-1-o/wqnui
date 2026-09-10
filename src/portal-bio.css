@@ -1,0 +1,52 @@
+/* Bio-style portal opening physics
+   Keeps wqnui's blue visual theme, but matches Bio's flip/open behavior. */
+.portal-shell {
+  transform-origin: center;
+  will-change: transform;
+  transition: none;
+}
+
+.portal-shell.armed {
+  height: 208px;
+  z-index: 20;
+}
+
+.portal-card {
+  will-change: transform;
+  transition: none;
+}
+
+.portal-shell.armed .portal-card {
+  height: 208px;
+  border-radius: 23px;
+  overflow: hidden;
+}
+
+.portal-face,
+.portal-open {
+  backface-visibility: hidden;
+}
+
+.portal-open {
+  opacity: 0;
+  pointer-events: none;
+  transform: rotate(180deg);
+  transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.portal-shell.armed .portal-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: rotate(0deg);
+}
+
+.portal-shell.armed .portal-face {
+  opacity: 0;
+}
+
+@media (max-width: 520px) {
+  .portal-shell.armed,
+  .portal-shell.armed .portal-card {
+    height: 200px;
+  }
+}
