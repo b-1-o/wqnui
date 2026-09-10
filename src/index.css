@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Outfit:wght@300;400;500&display=swap');
 :root {
   font-family: Outfit, system-ui, sans-serif;
   color: #effaff;
@@ -13,7 +12,11 @@ html, body, #root {
   min-height: 100%;
   background: #020b15;
 }
-body { overflow-x: hidden; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 button, input { font: inherit; }
 button { border: 0; background: none; color: inherit; cursor: pointer; }
 a { color: inherit; }
