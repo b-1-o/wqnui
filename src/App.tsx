@@ -24,28 +24,28 @@ const LINKS = [
     username: "@wqnui1",
     href: "https://www.tiktok.com/@wqnui1",
     glyph: "♪",
-    image: `${ASSET_BASE}/provo.jpg`,
+    image: `${ASSET_BASE}/alal.jpg`,
   },
   {
     label: "Telegram",
     username: "@wqnui",
     href: "https://t.me/wqnui",
     glyph: "◈",
-    image: `${ASSET_BASE}/alal.jpg`,
+    image: `${ASSET_BASE}/anhy.jpg`,
   },
   {
     label: "VK",
     username: "vk.ru/wqnui",
     href: "https://vk.ru/wqnui",
     glyph: "◎",
-    image: `${ASSET_BASE}/anhy.jpg`,
+    image: `${ASSET_BASE}/alal.jpg`,
   },
   {
     label: "Discord",
     username: "discord.gg/Rbu3h4US",
     href: "https://discord.gg/Rbu3h4US",
     glyph: "◌",
-    image: `${ASSET_BASE}/snow.jpg`,
+    image: `${ASSET_BASE}/anhy.jpg`,
   },
 ];
 
@@ -86,22 +86,16 @@ const LYRICS: { time: number; text: string }[] = [
 
 function PlayIcon({ playing }: { playing: boolean }) {
   return playing ? (
-    <svg viewBox="0 0 24 24"><path d="M7.5 5.5h3v13h-3zm6 0h3v13h-3z" /></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 5.5h3v13h-3zm6 0h3v13h-3z" /></svg>
   ) : (
-    <svg viewBox="0 0 24 24"><path d="m8.5 5.8 10 6.2-10 6.2z" /></svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8.5 5.8 10 6.2-10 6.2z" /></svg>
   );
 }
-function Chevron({ direction = "right" }: { direction?: "left" | "right" }) {
+
+function Chevron() {
   return (
-    <svg viewBox="0 0 24 24">
-      <path d={direction === "right" ? "m9 5 7 7-7 7" : "m15 5-7 7 7 7"} />
-    </svg>
-  );
-}
-function ShuffleIcon() {
-  return (
-    <svg viewBox="0 0 24 24">
-      <path d="M4 7h2.2c2.4 0 3.8 1.8 5.1 5s2.7 5 5.2 5H20m-3-3 3 3-3 3M4 17h2.2c1.6 0 2.8-.8 3.8-2.1M14.3 9.1C15.5 7.7 16.5 7 18 7H20m-3-3 3 3-3 3" />
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m9 5 7 7-7 7" />
     </svg>
   );
 }
@@ -110,29 +104,34 @@ function Visualizer({ analyser, playing }: { analyser: AnalyserNode | null; play
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d", { alpha: true });
-    if (!canvas || !ctx) return;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
     let raf = 0;
     let width = 1;
     let height = 1;
     const data = new Uint8Array(analyser?.frequencyBinCount || 128);
+
     const resize = () => {
       const r = canvas.getBoundingClientRect();
       width = Math.max(1, r.width);
       height = Math.max(1, r.height);
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
+
     resize();
     window.addEventListener("resize", resize, { passive: true });
+
     if (!playing) {
       ctx.clearRect(0, 0, width, height);
-      window.removeEventListener("resize", resize);
       return () => window.removeEventListener("resize", resize);
     }
-    const count = 24;
+
+    const count = 22;
     const bw = width / count;
     const center = height / 2;
     const gradient = ctx.createLinearGradient(0, 0, 0, height);
@@ -141,6 +140,7 @@ function Visualizer({ analyser, playing }: { analyser: AnalyserNode | null; play
     gradient.addColorStop(0.62, "rgba(70,180,255,.9)");
     gradient.addColorStop(1, "rgba(255,255,255,.02)");
     ctx.fillStyle = gradient;
+
     const draw = () => {
       analyser?.getByteFrequencyData(data);
       ctx.clearRect(0, 0, width, height);
@@ -156,12 +156,14 @@ function Visualizer({ analyser, playing }: { analyser: AnalyserNode | null; play
       ctx.globalAlpha = 1;
       raf = requestAnimationFrame(draw);
     };
+
     raf = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
     };
   }, [analyser, playing]);
+
   return <canvas ref={canvasRef} className="visualizer" />;
 }
 
@@ -175,10 +177,12 @@ function Background({ playing, bgIndex }: { playing: boolean; bgIndex: number })
           className="background-image"
           src={source}
           alt=""
-          initial={{ opacity: 0, scale: 1.025 }}
+          decoding="async"
+          loading="eager"
+          initial={{ opacity: 0, scale: 1.02 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         />
       </AnimatePresence>
       <div className="background-colorwash" />
@@ -201,15 +205,16 @@ function PortalLink({
 }) {
   return (
     <div className={`portal-shell ${armed ? "armed" : ""}`}>
-      <div className="portal-card glass" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="portal-card glass">
         <div className="portal-face">
           <span className="portal-glyph">{link.glyph}</span>
           <span className="portal-label">{link.label}</span>
           <span className="portal-orbit">↗</span>
         </div>
+
         <div className="portal-open">
           <div className="social-art">
-            <img src={link.image} alt="" loading="eager" decoding="async" />
+            <img src={link.image} alt="" loading="lazy" decoding="async" />
             <span className="social-art-shine" />
           </div>
           <div className="portal-copy">
@@ -221,17 +226,20 @@ function PortalLink({
             className="portal-go"
             href={link.href}
             target="_blank"
-            rel="noreferrer"
-            onClick={(e) => e.stopPropagation()}
+            rel="noopener noreferrer"
             aria-label={`Open ${link.label}`}
+            onClick={(e) => e.stopPropagation()}
           >
             <Chevron />
           </a>
-          <button className="portal-close" onClick={onReset} aria-label={`Close ${link.label}`}>
+          <button type="button" className="portal-close" onClick={onReset} aria-label={`Close ${link.label}`}>
             ×
           </button>
         </div>
-        {!armed && <button className="portal-hit" onClick={onArm} aria-label={`Open ${link.label}`} />}
+
+        {!armed && (
+          <button type="button" className="portal-hit" onClick={onArm} aria-label={`Open ${link.label}`} />
+        )}
       </div>
     </div>
   );
@@ -290,7 +298,7 @@ export default function App() {
   useEffect(() => {
     const audio = new Audio(TRACK);
     audio.crossOrigin = "anonymous";
-    audio.preload = "auto";
+    audio.preload = "metadata";
     audio.volume = 1;
     audioRef.current = audio;
     sourceRef.current = null;
@@ -317,6 +325,7 @@ export default function App() {
 
     return () => {
       audio.pause();
+      audio.src = "";
       audio.removeEventListener("timeupdate", onTime);
       audio.removeEventListener("loadedmetadata", onMeta);
       audio.removeEventListener("ended", onEnded);
@@ -331,11 +340,11 @@ export default function App() {
 
   useEffect(() => {
     if (!playing) return;
-    const id = window.setInterval(() => setBgIndex((i) => (i + 1) % BG_POOL.length), 12000);
+    const id = window.setInterval(() => setBgIndex((i) => (i + 1) % BG_POOL.length), 14000);
     return () => clearInterval(id);
   }, [playing]);
 
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     setupAudio();
@@ -351,7 +360,7 @@ export default function App() {
       audio.pause();
       setPlaying(false);
     }
-  };
+  }, [setupAudio]);
 
   const seek = (e: React.PointerEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -375,27 +384,34 @@ export default function App() {
     activeLyricIndex >= 0 && activeLyricIndex + 1 < LYRICS.length ? LYRICS[activeLyricIndex + 1] : null;
 
   const expanded = playing || lyricsOpen;
+  const portalOpen = armedLink !== null;
+
+  // Clicking player while a portal is open → close portal & restore player
+  const onPlayerPointerDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    if (portalOpen) setArmedLink(null);
+  };
 
   return (
-    <div className="app" onPointerDown={() => armedLink !== null && setArmedLink(null)}>
+    <div className="app" onPointerDown={() => portalOpen && setArmedLink(null)}>
       <Background playing={playing} bgIndex={bgIndex} />
-      <main className={`page ${armedLink !== null ? "portal-open-page" : ""}`}>
+      <main className={`page ${portalOpen ? "portal-open-page" : ""}`}>
         <motion.header
           className="identity"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <span className="identity-mark">wqnui</span>
           <span className="identity-name">psycho_b1o</span>
         </motion.header>
 
         <section
-          className={`player glass ${playing ? "playing" : ""} ${armedLink !== null ? "collapsed" : ""} ${expanded ? "lyrics-mode" : ""}`}
-          onPointerDown={(e) => e.stopPropagation()}
+          className={`player glass ${playing ? "playing" : ""} ${portalOpen ? "collapsed" : ""} ${expanded ? "lyrics-mode" : ""}`}
+          onPointerDown={onPlayerPointerDown}
         >
           <div className="player-collapsed">
-            <button className="mini-play" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
+            <button type="button" className="mini-play" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
               <PlayIcon playing={playing} />
             </button>
             <div className="mini-track">
@@ -423,8 +439,8 @@ export default function App() {
                 <div className="core-reflection" />
                 <motion.div
                   className="core-pulse"
-                  animate={playing ? { scale: [1, 1.16, 1], opacity: [0.28, 0.66, 0.28] } : { scale: 1, opacity: 0.2 }}
-                  transition={playing ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" } : { duration: 0.25 }}
+                  animate={playing ? { scale: [1, 1.14, 1], opacity: [0.28, 0.62, 0.28] } : { scale: 1, opacity: 0.2 }}
+                  transition={playing ? { duration: 1.8, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
                 />
                 <div className="core-line" />
               </div>
@@ -437,13 +453,8 @@ export default function App() {
             </div>
 
             <div className="player-controls">
-              <button className="control-button" aria-label="Shuffle" disabled>
-                <ShuffleIcon />
-              </button>
-              <button className="control-button" aria-label="Previous" disabled>
-                <Chevron direction="left" />
-              </button>
               <motion.button
+                type="button"
                 className="play-button"
                 onClick={togglePlay}
                 whileTap={{ scale: 0.92 }}
@@ -451,9 +462,6 @@ export default function App() {
               >
                 <PlayIcon playing={playing} />
               </motion.button>
-              <button className="control-button" aria-label="Next" disabled>
-                <Chevron />
-              </button>
             </div>
 
             <div className="progress-track" onPointerDown={seek} role="slider" aria-label="Track progress">
@@ -471,27 +479,13 @@ export default function App() {
             </div>
 
             <div className={`lyrics-panel ${lyricsOpen ? "open" : ""}`}>
-              <div className="lyrics-scroll">
-                {LYRICS.map((line, i) => {
-                  const isActive = i === activeLyricIndex;
-                  const isPast = i < activeLyricIndex;
-                  return (
-                    <div
-                      key={`${line.time}-${i}`}
-                      className={`lyric-line ${isActive ? "active" : ""} ${isPast ? "past" : ""}`}
-                    >
-                      {line.text}
-                    </div>
-                  );
-                })}
-              </div>
               {activeLyric && (
                 <div className="lyric-spotlight">
                   <motion.div
                     key={activeLyric.time}
-                    initial={{ opacity: 0, y: 10, filter: "blur(6px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    transition={{ duration: 0.35 }}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
                     className="lyric-current"
                   >
                     {activeLyric.text}
@@ -503,39 +497,20 @@ export default function App() {
           </div>
         </section>
 
-        <motion.nav
-          className="links"
-          initial="hidden"
-          animate="show"
-          variants={{
-            hidden: {},
-            show: { transition: { staggerChildren: 0.055, delayChildren: 0.2 } },
-          }}
-        >
+        <nav className="links">
           {LINKS.map((link, index) => (
-            <motion.div
-              key={link.label}
-              className={`link-row ${armedLink === index ? "active-row" : ""}`}
-              variants={{ hidden: { opacity: 1 }, show: { opacity: 1 } }}
-            >
+            <div key={link.label} className={`link-row ${armedLink === index ? "active-row" : ""}`}>
               <PortalLink
                 link={link}
                 armed={armedLink === index}
                 onArm={() => setArmedLink(index)}
                 onReset={() => setArmedLink(null)}
               />
-            </motion.div>
+            </div>
           ))}
-        </motion.nav>
+        </nav>
 
-        <motion.footer
-          className="footer"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.42 }}
-          transition={{ delay: 0.7, duration: 0.5 }}
-        >
-          wqnui · blue glass
-        </motion.footer>
+        <footer className="footer">wqnui · blue glass</footer>
       </main>
     </div>
   );
