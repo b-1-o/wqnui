@@ -470,7 +470,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
 }
 .link-row { width: 100%; min-height: 58px; position: relative; }
 
-/* Portals — Bio-style expand (no broken 3D flip) */
+/* Portals — 3D flip spin on open (like Bio intent) */
 .portal-shell {
   position: relative;
   width: 100%;
@@ -478,6 +478,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   transform-origin: center;
   will-change: height;
   z-index: 1;
+  perspective: 1100px;
   transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .portal-shell.armed {
@@ -490,16 +491,20 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   height: 58px;
   border-radius: 19px;
   overflow: visible;
-  will-change: height;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  will-change: transform, height;
   transition:
     height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 0.45s ease,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.45s ease;
 }
 .portal-shell.armed .portal-card {
   height: 208px;
   border-radius: 23px;
   overflow: hidden;
+  transform: rotateY(180deg);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.58), 0 0 45px rgba(43, 181, 255, 0.14);
 }
 .portal-face,
@@ -509,28 +514,25 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   padding: 0 15px;
-  transition: opacity 0.28s ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .portal-face {
   gap: 13px;
+  transform: rotateY(0deg);
 }
 .portal-open {
-  opacity: 0;
-  pointer-events: none;
+  transform: rotateY(180deg);
   padding: 15px;
   display: grid;
   grid-template-columns: 92px 1fr 44px;
   align-items: center;
   gap: 12px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(8, 30, 52, 0.38));
+  pointer-events: none;
 }
 .portal-shell.armed .portal-open {
-  opacity: 1;
   pointer-events: auto;
-}
-.portal-shell.armed .portal-face {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .portal-glyph {
@@ -699,4 +701,5 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
     transition-duration: 0.001ms !important;
   }
   .background-fog { animation: none; }
+  .portal-card { transform: none !important; }
 }
