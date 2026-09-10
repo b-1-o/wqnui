@@ -1,0 +1,2 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Outfit:wght@300;400;500&display=swap');
+:root{font-family:Outfit,system-ui,sans-serif;color:#effaff;background:#030e1b;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}html,body,#root{margin:0;width:100%;min-height:100%;background:#030e1b}body{overflow-x:hidden}button,input{font:inherit}button{border:0;background:none;color:inherit;cursor:pointer}a{color:inherit}
