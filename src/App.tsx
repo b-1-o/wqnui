@@ -357,7 +357,6 @@ export default function App() {
     if (audioRef.current) audioRef.current.volume = armedLink === null ? 1 : 0.18;
   }, [armedLink]);
 
-  // Cycle backgrounds while playing and no portal is open
   useEffect(() => {
     if (!playing || armedLink !== null) return;
     const id = window.setInterval(() => setBgIndex((i) => (i + 1) % BG_CYCLE.length), 12000);
@@ -408,7 +407,6 @@ export default function App() {
   const expanded = playing || lyricsOpen;
   const portalOpen = armedLink !== null;
 
-  // Background priority: portal bg > playing cycle > default idle
   const bgSource = useMemo(() => {
     if (armedLink !== null) return LINKS[armedLink].bg;
     if (playing) return BG_CYCLE[bgIndex % BG_CYCLE.length] || PLAY_BG;
@@ -532,7 +530,10 @@ export default function App() {
 
         <nav className="links" onPointerDown={(e) => e.stopPropagation()}>
           {LINKS.map((link, index) => (
-            <div key={link.label} className={`link-row ${armedLink === index ? "active-row" : ""`}>
+            <div
+              key={link.label}
+              className={`link-row ${armedLink === index ? "active-row" : ""}`}
+            >
               <PortalLink
                 link={link}
                 armed={armedLink === index}
