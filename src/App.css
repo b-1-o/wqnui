@@ -483,42 +483,61 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
 }
 .link-row { width: 100%; min-height: 58px; position: relative; }
 
+/* ===== Portal cards with 3D flip spin ===== */
 .portal-shell {
   position: relative;
   width: 100%;
   height: 58px;
   transform-origin: center;
-  will-change: transform;
+  will-change: height, transform;
   z-index: 1;
+  perspective: 900px;
+  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.portal-shell.armed { height: 208px; z-index: 20; }
+.portal-shell.armed {
+  height: 208px;
+  z-index: 20;
+}
 .portal-card {
   position: relative;
   width: 100%;
   height: 58px;
   border-radius: 19px;
   overflow: visible;
-  will-change: transform;
+  will-change: transform, height;
+  transform-style: preserve-3d;
+  transition:
+    height 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.45s ease,
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s ease;
 }
 .portal-shell.armed .portal-card {
   height: 208px;
   border-radius: 23px;
   overflow: hidden;
+  transform: rotateY(180deg);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.58), 0 0 45px rgba(43, 181, 255, 0.14);
 }
-.portal-face, .portal-open {
+.portal-face,
+.portal-open {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   padding: 0 15px;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: opacity 0.25s ease;
 }
-.portal-face { gap: 13px; }
+.portal-face {
+  gap: 13px;
+  transform: rotateY(0deg);
+}
 .portal-open {
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
-  transform: rotate(180deg);
+  transform: rotateY(180deg);
   padding: 15px;
   display: grid;
   grid-template-columns: 92px 1fr 44px;
@@ -526,8 +545,12 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   gap: 12px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(8, 30, 52, 0.38));
 }
-.portal-shell.armed .portal-open { opacity: 1; pointer-events: auto; }
-.portal-shell.armed .portal-face { opacity: 0; }
+.portal-shell.armed .portal-open {
+  pointer-events: auto;
+}
+.portal-shell.armed .portal-face {
+  pointer-events: none;
+}
 
 .portal-glyph {
   width: 28px;
@@ -660,7 +683,8 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   .play-button { width: 54px; height: 54px; }
   .player.collapsed { height: 68px; }
   .mini-play { width: 42px; height: 42px; }
-  .portal-shell.armed, .portal-shell.armed .portal-card { height: 200px; }
+  .portal-shell.armed,
+  .portal-shell.armed .portal-card { height: 200px; }
   .portal-open { grid-template-columns: 78px 1fr 40px; padding: 13px; gap: 10px; }
   .social-art { height: 148px; }
   .portal-copy strong { font-size: 11px; }
@@ -682,4 +706,5 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
     transition-duration: 0.001ms !important;
   }
   .background-fog { animation: none; }
+  .portal-card { transform: none !important; }
 }
