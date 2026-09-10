@@ -5,15 +5,17 @@ import "./App.css";
 const ASSET_BASE = "https://raw.githubusercontent.com/b-1-o/wqnui/main/assets";
 const MUSIC_BASE = "https://raw.githubusercontent.com/b-1-o/wqnui/main/music";
 
+// Backgrounds only (not button images)
 const MAIN_BG = `${ASSET_BASE}/more.jpg`;
-const BG_POOL = [
-  `${ASSET_BASE}/more.jpg`,
+const PLAY_BG = `${ASSET_BASE}/blfr.jpg`;
+const BG_CYCLE = [
   `${ASSET_BASE}/assa.jpg`,
   `${ASSET_BASE}/luja.jpg`,
   `${ASSET_BASE}/chhc.jpg`,
   `${ASSET_BASE}/snow.jpg`,
   `${ASSET_BASE}/blfr.jpg`,
 ];
+
 const TRACK = `${MUSIC_BASE}/Kai-Angel-lovesong-Official-Music-Video.mp3`;
 const TRACK_NAME = "lovesong";
 const ARTIST = "Kai Angel";
@@ -25,6 +27,7 @@ const LINKS = [
     href: "https://www.tiktok.com/@wqnui1",
     glyph: "♪",
     image: `${ASSET_BASE}/alal.jpg`,
+    bg: `${ASSET_BASE}/assa.jpg`,
   },
   {
     label: "Telegram",
@@ -32,6 +35,7 @@ const LINKS = [
     href: "https://t.me/wqnui",
     glyph: "◈",
     image: `${ASSET_BASE}/anhy.jpg`,
+    bg: `${ASSET_BASE}/luja.jpg`,
   },
   {
     label: "VK",
@@ -39,6 +43,7 @@ const LINKS = [
     href: "https://vk.ru/wqnui",
     glyph: "◎",
     image: `${ASSET_BASE}/provo.jpg`,
+    bg: `${ASSET_BASE}/chhc.jpg`,
   },
   {
     label: "Discord",
@@ -46,6 +51,7 @@ const LINKS = [
     href: "https://discord.gg/Rbu3h4US",
     glyph: "◌",
     image: `${ASSET_BASE}/pixi.jpg`,
+    bg: `${ASSET_BASE}/snow.jpg`,
   },
 ];
 
@@ -167,8 +173,7 @@ function Visualizer({ analyser, playing }: { analyser: AnalyserNode | null; play
   return <canvas ref={canvasRef} className="visualizer" />;
 }
 
-function Background({ playing, bgIndex }: { playing: boolean; bgIndex: number }) {
-  const source = playing ? BG_POOL[bgIndex % BG_POOL.length] : MAIN_BG;
+function Background({ source }: { source: string }) {
   return (
     <div className="background">
       <AnimatePresence initial={false} mode="sync">
@@ -179,10 +184,10 @@ function Background({ playing, bgIndex }: { playing: boolean; bgIndex: number })
           alt=""
           decoding="async"
           loading="eager"
-          initial={{ opacity: 0, scale: 1.02 }}
+          initial={{ opacity: 0, scale: 1.03 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         />
       </AnimatePresence>
       <div className="background-colorwash" />
@@ -192,7 +197,6 @@ function Background({ playing, bgIndex }: { playing: boolean; bgIndex: number })
   );
 }
 
-/** Same UX as Bio: expand height, show image + go link */
 function PortalLink({
   link,
   armed,
@@ -329,7 +333,7 @@ export default function App() {
     const onPlay = () => setPlaying(true);
     const onPause = () => {
       setPlaying(false);
-      setLyricsOpen(false); // collapse lyrics on pause
+      setLyricsOpen(false);
     };
 
     audio.addEventListener("timeupdate", onTime);
@@ -353,11 +357,12 @@ export default function App() {
     if (audioRef.current) audioRef.current.volume = armedLink === null ? 1 : 0.18;
   }, [armedLink]);
 
+  // Cycle backgrounds while playing and no portal is open
   useEffect(() => {
-    if (!playing) return;
-    const id = window.setInterval(() => setBgIndex((i) => (i + 1) % BG_POOL.length), 14000);
+    if (!playing || armedLink !== null) return;
+    const id = window.setInterval(() => setBgIndex((i) => (i + 1) % BG_CYCLE.length), 12000);
     return () => clearInterval(id);
-  }, [playing]);
+  }, [playing, armedLink]);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -369,6 +374,7 @@ export default function App() {
         .then(() => {
           setPlaying(true);
           setLyricsOpen(true);
+          setBgIndex(0);
         })
         .catch(() => setPlaying(false));
     } else {
@@ -402,6 +408,13 @@ export default function App() {
   const expanded = playing || lyricsOpen;
   const portalOpen = armedLink !== null;
 
+  // Background priority: portal bg > playing cycle > default idle
+  const bgSource = useMemo(() => {
+    if (armedLink !== null) return LINKS[armedLink].bg;
+    if (playing) return BG_CYCLE[bgIndex % BG_CYCLE.length] || PLAY_BG;
+    return MAIN_BG;
+  }, [armedLink, playing, bgIndex]);
+
   const onPlayerPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
     if (portalOpen) setArmedLink(null);
@@ -414,7 +427,7 @@ export default function App() {
         if (portalOpen) setArmedLink(null);
       }}
     >
-      <Background playing={playing} bgIndex={bgIndex} />
+      <Background source={bgSource} />
       <main className={`page ${portalOpen ? "portal-open-page" : ""}`}>
         <motion.header
           className="identity"
@@ -519,7 +532,7 @@ export default function App() {
 
         <nav className="links" onPointerDown={(e) => e.stopPropagation()}>
           {LINKS.map((link, index) => (
-            <div key={link.label} className={`link-row ${armedLink === index ? "active-row" : ""}`}>
+            <div key={link.label} className={`link-row ${armedLink === index ? "active-row" : ""`}>
               <PortalLink
                 link={link}
                 armed={armedLink === index}
