@@ -1,0 +1,78 @@
+/* Telegram WebView / mobile performance layer.
+   Keep animations on compositor-friendly properties and avoid unnecessary paint work. */
+
+.app,
+.background,
+.page,
+.portal-shell,
+.portal-card,
+.player {
+  -webkit-transform: translateZ(0);
+}
+
+.background-image,
+.background-fog,
+.portal-open,
+.portal-card,
+.portal-shell,
+.player,
+.identity {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.background-image,
+.background-fog,
+.portal-open,
+.portal-card,
+.portal-shell {
+  contain: paint;
+}
+
+/* Do not keep large layers promoted unless they actually animate. */
+.background-image,
+.background-fog,
+.portal-open,
+.portal-shell,
+.portal-card {
+  will-change: auto;
+}
+
+/* The portal flip and background transition explicitly opt into compositor work. */
+.portal-open,
+.portal-shell.armed .portal-card,
+.background-image {
+  will-change: transform, opacity;
+}
+
+button,
+a,
+.portal-hit {
+  touch-action: manipulation;
+}
+
+/* Slightly cheaper blur on small WebViews while preserving the glass look. */
+@media (max-width: 520px) {
+  .glass {
+    backdrop-filter: blur(14px) saturate(108%);
+    -webkit-backdrop-filter: blur(14px) saturate(108%);
+  }
+
+  .background-fog {
+    filter: blur(28px);
+  }
+
+  .visualizer {
+    opacity: .62;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .background-fog,
+  .ring-one,
+  .ring-two,
+  .ring-three,
+  .live-indicator i {
+    animation: none !important;
+  }
+}
