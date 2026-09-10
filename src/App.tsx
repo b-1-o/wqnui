@@ -38,14 +38,14 @@ const LINKS = [
     username: "vk.ru/wqnui",
     href: "https://vk.ru/wqnui",
     glyph: "◎",
-    image: `${ASSET_BASE}/alal.jpg`,
+    image: `${ASSET_BASE}/provo.jpg`,
   },
   {
     label: "Discord",
     username: "discord.gg/Rbu3h4US",
     href: "https://discord.gg/Rbu3h4US",
     glyph: "◌",
-    image: `${ASSET_BASE}/anhy.jpg`,
+    image: `${ASSET_BASE}/pixi.jpg`,
   },
 ];
 
@@ -204,7 +204,10 @@ function PortalLink({
   onReset: () => void;
 }) {
   return (
-    <div className={`portal-shell ${armed ? "armed" : ""}`}>
+    <div
+      className={`portal-shell ${armed ? "armed" : ""}`}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
       <div className="portal-card glass">
         <div className="portal-face">
           <span className="portal-glyph">{link.glyph}</span>
@@ -238,7 +241,15 @@ function PortalLink({
         </div>
 
         {!armed && (
-          <button type="button" className="portal-hit" onClick={onArm} aria-label={`Open ${link.label}`} />
+          <button
+            type="button"
+            className="portal-hit"
+            onClick={(e) => {
+              e.stopPropagation();
+              onArm();
+            }}
+            aria-label={`Open ${link.label}`}
+          />
         )}
       </div>
     </div>
@@ -386,14 +397,19 @@ export default function App() {
   const expanded = playing || lyricsOpen;
   const portalOpen = armedLink !== null;
 
-  // Clicking player while a portal is open → close portal & restore player
+  // Click player while portal open → close portal, restore player
   const onPlayerPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
     if (portalOpen) setArmedLink(null);
   };
 
   return (
-    <div className="app" onPointerDown={() => portalOpen && setArmedLink(null)}>
+    <div
+      className="app"
+      onPointerDown={() => {
+        if (portalOpen) setArmedLink(null);
+      }}
+    >
       <Background playing={playing} bgIndex={bgIndex} />
       <main className={`page ${portalOpen ? "portal-open-page" : ""}`}>
         <motion.header
@@ -497,7 +513,7 @@ export default function App() {
           </div>
         </section>
 
-        <nav className="links">
+        <nav className="links" onPointerDown={(e) => e.stopPropagation()}>
           {LINKS.map((link, index) => (
             <div key={link.label} className={`link-row ${armedLink === index ? "active-row" : ""}`}>
               <PortalLink

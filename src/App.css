@@ -44,22 +44,22 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   object-position: center;
   will-change: opacity;
   transform: translateZ(0);
-  filter: saturate(0.75) brightness(0.55) contrast(1.05);
+  filter: saturate(0.88) brightness(0.78) contrast(1.04);
 }
 .background-colorwash {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(2, 11, 21, 0.35), rgba(2, 11, 21, 0.72)),
-    radial-gradient(ellipse at 50% 20%, rgba(40, 140, 220, 0.18), transparent 55%);
+    linear-gradient(180deg, rgba(2, 11, 21, 0.12), rgba(2, 11, 21, 0.38)),
+    radial-gradient(ellipse at 50% 18%, rgba(40, 140, 220, 0.12), transparent 55%);
   pointer-events: none;
 }
 .background-fog {
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(ellipse at 40% 35%, rgba(139, 224, 255, 0.14), transparent 30%),
-    radial-gradient(ellipse at 70% 65%, rgba(67, 132, 255, 0.13), transparent 34%);
+    radial-gradient(ellipse at 40% 35%, rgba(139, 224, 255, 0.1), transparent 30%),
+    radial-gradient(ellipse at 70% 65%, rgba(67, 132, 255, 0.09), transparent 34%);
   filter: blur(40px);
   animation: fogMove 28s ease-in-out infinite alternate;
   pointer-events: none;
@@ -68,7 +68,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
 .background-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, transparent 30%, rgba(1, 8, 15, 0.55) 76%, rgba(1, 8, 15, 0.85) 100%);
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(1, 8, 15, 0.28) 78%, rgba(1, 8, 15, 0.55) 100%);
   pointer-events: none;
 }
 
@@ -569,7 +569,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: saturate(0.82) contrast(1.06) brightness(0.76);
+  filter: saturate(0.9) contrast(1.05) brightness(0.88);
 }
 .social-art-shine {
   position: absolute;
