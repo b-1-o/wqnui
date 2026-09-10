@@ -5,7 +5,6 @@ import "./App.css";
 const ASSET_BASE = "https://raw.githubusercontent.com/b-1-o/wqnui/main/assets";
 const MUSIC_BASE = "https://raw.githubusercontent.com/b-1-o/wqnui/main/music";
 
-// Backgrounds only (not button images)
 const MAIN_BG = `${ASSET_BASE}/more.jpg`;
 const PLAY_BG = `${ASSET_BASE}/blfr.jpg`;
 const BG_CYCLE = [
@@ -197,6 +196,7 @@ function Background({ source }: { source: string }) {
   );
 }
 
+/** Exact Bio PortalLink structure */
 function PortalLink({
   link,
   armed,
@@ -209,20 +209,16 @@ function PortalLink({
   onReset: () => void;
 }) {
   return (
-    <div
-      className={`portal-shell ${armed ? "armed" : ""}`}
-      onPointerDown={(e) => e.stopPropagation()}
-    >
+    <div className={`portal-shell ${armed ? "armed" : ""}`}>
       <div className="portal-card glass" onPointerDown={(e) => e.stopPropagation()}>
         <div className="portal-face">
           <span className="portal-glyph">{link.glyph}</span>
           <span className="portal-label">{link.label}</span>
           <span className="portal-orbit">↗</span>
         </div>
-
         <div className="portal-open">
           <div className="social-art">
-            <img src={link.image} alt="" loading="lazy" decoding="async" />
+            <img src={link.image} alt="" loading="eager" decoding="async" />
             <span className="social-art-shine" />
           </div>
           <div className="portal-copy">
@@ -234,28 +230,17 @@ function PortalLink({
             className="portal-go"
             href={link.href}
             target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Open ${link.label}`}
+            rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
+            aria-label={`Open ${link.label}`}
           >
             <Chevron />
           </a>
-          <button type="button" className="portal-close" onClick={onReset} aria-label={`Close ${link.label}`}>
+          <button className="portal-close" onClick={onReset} aria-label={`Close ${link.label}`}>
             ×
           </button>
         </div>
-
-        {!armed && (
-          <button
-            type="button"
-            className="portal-hit"
-            onClick={(e) => {
-              e.stopPropagation();
-              onArm();
-            }}
-            aria-label={`Open ${link.label}`}
-          />
-        )}
+        {!armed && <button className="portal-hit" onClick={onArm} aria-label={`Open ${link.label}`} />}
       </div>
     </div>
   );
@@ -413,18 +398,8 @@ export default function App() {
     return MAIN_BG;
   }, [armedLink, playing, bgIndex]);
 
-  const onPlayerPointerDown = (e: React.PointerEvent) => {
-    e.stopPropagation();
-    if (portalOpen) setArmedLink(null);
-  };
-
   return (
-    <div
-      className="app"
-      onPointerDown={() => {
-        if (portalOpen) setArmedLink(null);
-      }}
-    >
+    <div className="app" onPointerDown={() => armedLink !== null && setArmedLink(null)}>
       <Background source={bgSource} />
       <main className={`page ${portalOpen ? "portal-open-page" : ""}`}>
         <motion.header
@@ -439,7 +414,10 @@ export default function App() {
 
         <section
           className={`player glass ${playing ? "playing" : ""} ${portalOpen ? "collapsed" : ""} ${expanded ? "lyrics-mode" : ""}`}
-          onPointerDown={onPlayerPointerDown}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            if (portalOpen) setArmedLink(null);
+          }}
         >
           <div className="player-collapsed">
             <button type="button" className="mini-play" onClick={togglePlay} aria-label={playing ? "Pause" : "Play"}>
@@ -528,12 +506,9 @@ export default function App() {
           </div>
         </section>
 
-        <nav className="links" onPointerDown={(e) => e.stopPropagation()}>
+        <nav className="links">
           {LINKS.map((link, index) => (
-            <div
-              key={link.label}
-              className={`link-row ${armedLink === index ? "active-row" : ""}`}
-            >
+            <div key={link.label} className={`link-row ${armedLink === index ? "active-row" : ""}`}>
               <PortalLink
                 link={link}
                 armed={armedLink === index}
