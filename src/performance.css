@@ -1,5 +1,4 @@
-/* Telegram WebView / mobile performance layer.
-   Keep animations on compositor-friendly properties and avoid unnecessary paint work. */
+/* Telegram WebView / mobile performance layer. */
 
 .app,
 .background,
@@ -21,26 +20,22 @@
   -webkit-backface-visibility: hidden;
 }
 
-.background-image,
-.background-fog,
-.portal-open,
-.portal-card,
-.portal-shell {
-  contain: paint;
+/* Keep clipping on the actual rounded card. Do not use contain:paint here:
+   Telegram WebView/WebKit can render square/grey corner artifacts when a
+   transformed glass layer is clipped by paint containment. */
+.portal-card {
+  overflow: hidden;
+  isolation: isolate;
 }
 
-/* Do not keep large layers promoted unless they actually animate. */
-.background-image,
-.background-fog,
-.portal-open,
 .portal-shell,
-.portal-card {
+.portal-card,
+.portal-open {
   will-change: auto;
 }
 
-/* The portal flip and background transition explicitly opt into compositor work. */
-.portal-open,
 .portal-shell.armed .portal-card,
+.portal-open,
 .background-image {
   will-change: transform, opacity;
 }
@@ -51,7 +46,6 @@ a,
   touch-action: manipulation;
 }
 
-/* Slightly cheaper blur on small WebViews while preserving the glass look. */
 @media (max-width: 520px) {
   .glass {
     backdrop-filter: blur(14px) saturate(108%);
