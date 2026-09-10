@@ -1,43 +1,19 @@
-/* Telegram WebView / mobile performance layer. */
+/* Telegram WebView performance layer.
+   Keep the portal animation and background swaps on cheap compositor paths. */
 
-.app,
-.background,
-.page,
+.background-image,
+.portal-open,
 .portal-shell,
 .portal-card,
 .player {
   -webkit-transform: translateZ(0);
-}
-
-.background-image,
-.background-fog,
-.portal-open,
-.portal-card,
-.portal-shell,
-.player,
-.identity {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-/* Keep clipping on the actual rounded card. Do not use contain:paint here:
-   Telegram WebView/WebKit can render square/grey corner artifacts when a
-   transformed glass layer is clipped by paint containment. */
+/* Do not use paint containment on rounded glass cards in WebKit/Telegram. */
 .portal-card {
-  overflow: hidden;
   isolation: isolate;
-}
-
-.portal-shell,
-.portal-card,
-.portal-open {
-  will-change: auto;
-}
-
-.portal-shell.armed .portal-card,
-.portal-open,
-.background-image {
-  will-change: transform, opacity;
 }
 
 button,
