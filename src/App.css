@@ -14,6 +14,7 @@ body {
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 button, a { font: inherit; -webkit-tap-highlight-color: transparent; }
 button { border: 0; background: none; color: inherit; cursor: pointer; }
@@ -32,6 +33,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   z-index: 0;
   overflow: hidden;
   background: #020b15;
+  contain: strict;
 }
 .background-image {
   position: absolute;
@@ -40,7 +42,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   height: 104%;
   object-fit: cover;
   object-position: center;
-  will-change: opacity, transform;
+  will-change: opacity;
   transform: translateZ(0);
   filter: saturate(0.75) brightness(0.55) contrast(1.05);
 }
@@ -58,9 +60,10 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   background:
     radial-gradient(ellipse at 40% 35%, rgba(139, 224, 255, 0.14), transparent 30%),
     radial-gradient(ellipse at 70% 65%, rgba(67, 132, 255, 0.13), transparent 34%);
-  filter: blur(48px);
+  filter: blur(40px);
   animation: fogMove 28s ease-in-out infinite alternate;
   pointer-events: none;
+  will-change: transform;
 }
 .background-vignette {
   position: absolute;
@@ -87,7 +90,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-  transition: opacity 0.35s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .portal-open-page .identity {
   opacity: 0;
@@ -115,8 +118,8 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.016) 48%, rgba(21, 92, 145, 0.11));
   border: 1px solid rgba(151, 226, 255, 0.18);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 22px 65px rgba(0, 7, 19, 0.46);
-  backdrop-filter: blur(20px) saturate(112%);
-  -webkit-backdrop-filter: blur(20px) saturate(112%);
+  backdrop-filter: blur(18px) saturate(110%);
+  -webkit-backdrop-filter: blur(18px) saturate(110%);
 }
 
 .player {
@@ -126,15 +129,13 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   padding: 13px 15px 15px;
   border-radius: 26px;
   overflow: hidden;
-  will-change: height, transform;
-  transition: height 0.62s cubic-bezier(0.22, 1, 0.36, 1), padding 0.62s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.5s ease;
+  will-change: height;
+  transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1), padding 0.55s cubic-bezier(0.22, 1, 0.36, 1), border-radius 0.45s ease;
 }
 .player.playing {
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.08), 0 25px 70px rgba(0, 0, 0, 0.5), 0 0 65px rgba(56, 185, 255, 0.12);
 }
-.player.lyrics-mode {
-  height: 620px;
-}
+.player.lyrics-mode { height: 600px; }
 .player::after {
   content: "";
   position: absolute;
@@ -142,7 +143,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   height: 45%;
   border-radius: 50%;
   background: rgba(52, 164, 235, 0.12);
-  filter: blur(40px);
+  filter: blur(36px);
   pointer-events: none;
 }
 .player.collapsed {
@@ -152,7 +153,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
 }
 .player-expanded {
   height: 100%;
-  transition: opacity 0.22s ease, transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.22s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex;
   flex-direction: column;
 }
@@ -165,7 +166,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   opacity: 0;
   pointer-events: none;
   transform: translateY(8px);
-  transition: opacity 0.22s, transform 0.4s;
+  transition: opacity 0.2s, transform 0.35s;
 }
 .player.collapsed .player-expanded {
   opacity: 0;
@@ -187,6 +188,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   background: linear-gradient(145deg, rgba(75, 211, 255, 0.55), rgba(32, 74, 145, 0.78));
   border: 1px solid rgba(255, 255, 255, 0.13);
   box-shadow: 0 0 24px rgba(55, 192, 255, 0.18);
+  flex-shrink: 0;
 }
 .mini-play svg { width: 15px; height: 15px; fill: #fff; }
 .mini-track { flex: 1; min-width: 0; }
@@ -262,7 +264,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(50, 197, 255, 0.34), transparent 68%);
-  filter: blur(20px);
+  filter: blur(18px);
   opacity: 0.5;
   transition: transform 0.7s;
 }
@@ -304,7 +306,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.015) 38%, rgba(25, 91, 150, 0.28));
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 0 42px rgba(51, 190, 255, 0.23), inset 0 1px rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
   z-index: 2;
 }
 .core-reflection {
@@ -335,7 +337,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   position: relative;
   z-index: 5;
   text-align: center;
-  margin: -2px 0 8px;
+  margin: -2px 0 10px;
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -355,46 +357,35 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
   flex-shrink: 0;
 }
-.control-button, .play-button { display: grid; place-items: center; border-radius: 50%; }
-.control-button {
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  color: rgba(241, 249, 255, 0.43);
-  background: rgba(255, 255, 255, 0.025);
-}
-.control-button:disabled { opacity: 0.35; cursor: default; }
-.control-button svg, .play-button svg {
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 .play-button {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
   color: #fff;
   background: linear-gradient(145deg, rgba(72, 209, 255, 0.9), rgba(30, 65, 135, 0.94));
   border: 1px solid rgba(255, 255, 255, 0.17);
   box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.02), 0 0 36px rgba(43, 171, 255, 0.28), inset 0 1px rgba(255, 255, 255, 0.18);
 }
-.play-button svg { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+.play-button svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
 
 .progress-track {
   position: relative;
   z-index: 5;
   height: 8px;
-  margin: 12px 4px 0;
+  margin: 14px 4px 0;
   border-radius: 99px;
   background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
   flex-shrink: 0;
+  touch-action: none;
 }
 .progress-fill {
   position: absolute;
@@ -420,7 +411,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 7px 4px 0;
+  margin: 8px 4px 0;
   font-size: 7px;
   letter-spacing: 0.12em;
   color: rgba(220, 245, 255, 0.36);
@@ -432,7 +423,6 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   color: rgba(190, 237, 255, 0.58);
 }
 
-/* Lyrics panel – Spotify-like */
 .lyrics-panel {
   position: relative;
   z-index: 5;
@@ -442,15 +432,12 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   opacity: 0;
   overflow: hidden;
   margin-top: 0;
-  transition: max-height 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s, margin 0.4s;
+  transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s, margin 0.35s;
 }
 .lyrics-panel.open {
-  max-height: 220px;
+  max-height: 200px;
   opacity: 1;
   margin-top: 10px;
-}
-.lyrics-scroll {
-  display: none;
 }
 .lyric-spotlight {
   height: 100%;
@@ -465,7 +452,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
 .lyric-current {
   font: 300 clamp(17px, 4.2vw, 24px) / 1.25 var(--serif);
   color: #f2fbff;
-  text-shadow: 0 3px 25px rgba(0, 8, 20, 0.85), 0 0 30px rgba(80, 200, 255, 0.15);
+  text-shadow: 0 3px 22px rgba(0, 8, 20, 0.85), 0 0 28px rgba(80, 200, 255, 0.15);
   max-width: 100%;
 }
 .lyric-next {
@@ -483,13 +470,13 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
 }
 .link-row { width: 100%; min-height: 58px; position: relative; }
 
-/* ===== Portal cards with 3D flip spin ===== */
+/* Portal cards — 3D flip */
 .portal-shell {
   position: relative;
   width: 100%;
   height: 58px;
   transform-origin: center;
-  will-change: height, transform;
+  will-change: height;
   z-index: 1;
   perspective: 900px;
   transition: height 0.55s cubic-bezier(0.22, 1, 0.36, 1);
@@ -528,15 +515,12 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   padding: 0 15px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  transition: opacity 0.25s ease;
 }
 .portal-face {
   gap: 13px;
   transform: rotateY(0deg);
 }
 .portal-open {
-  opacity: 1;
-  pointer-events: none;
   transform: rotateY(180deg);
   padding: 15px;
   display: grid;
@@ -544,12 +528,10 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   align-items: center;
   gap: 12px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(8, 30, 52, 0.38));
+  pointer-events: none;
 }
 .portal-shell.armed .portal-open {
   pointer-events: auto;
-}
-.portal-shell.armed .portal-face {
-  pointer-events: none;
 }
 
 .portal-glyph {
@@ -624,19 +606,31 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   color: #fff;
   background: linear-gradient(145deg, #4dcfff, #244d9d 75%);
   border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  z-index: 6;
+  text-decoration: none;
+  flex-shrink: 0;
 }
-.portal-go svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+.portal-go svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
 .portal-close {
   position: absolute;
   right: 10px;
   top: 9px;
-  width: 25px;
-  height: 25px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 16px;
   z-index: 8;
+  display: grid;
+  place-items: center;
 }
 .portal-hit {
   position: absolute;
@@ -645,6 +639,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   height: 100%;
   z-index: 5;
   opacity: 0;
+  cursor: pointer;
 }
 
 .footer {
@@ -672,15 +667,14 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
   .identity-mark { font-size: 35px; }
   .identity-name { font-size: 7px; letter-spacing: 0.42em; }
   .player { height: 400px; padding: 11px 12px 13px; }
-  .player.lyrics-mode { height: 580px; }
+  .player.lyrics-mode { height: 560px; }
   .visual-stage { height: 190px; }
   .ring-one { width: 138px; height: 138px; }
   .ring-two { width: 166px; height: 166px; }
   .ring-three { width: 114px; height: 114px; }
   .glass-core { width: 66px; height: 66px; }
   .core-pulse { inset: 20px; }
-  .control-button { width: 35px; height: 35px; }
-  .play-button { width: 54px; height: 54px; }
+  .play-button { width: 56px; height: 56px; }
   .player.collapsed { height: 68px; }
   .mini-play { width: 42px; height: 42px; }
   .portal-shell.armed,
@@ -695,7 +689,7 @@ button { border: 0; background: none; color: inherit; cursor: pointer; }
 @media (max-height: 700px) and (max-width: 520px) {
   .page { padding-top: 18px; }
   .player { height: 360px; }
-  .player.lyrics-mode { height: 520px; }
+  .player.lyrics-mode { height: 500px; }
   .visual-stage { height: 170px; }
   .links { margin-top: 9px; }
 }
