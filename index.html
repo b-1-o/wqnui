@@ -77,8 +77,9 @@ button{font:inherit;border:none;background:none;cursor:pointer}
   object-fit:contain;object-position:center 15%;
   opacity:0;
   mix-blend-mode:screen;
-  transition:opacity .5s ease;
+  transition:opacity .55s ease;
   pointer-events:none;
+  will-change:opacity;
 }
 .hero-build{
   position:absolute;z-index:3;left:0;top:0;width:100%;height:100%;
@@ -194,11 +195,15 @@ button{font:inherit;border:none;background:none;cursor:pointer}
 
 .wave{height:22px;display:flex;align-items:center;gap:2px;padding:0 14px}
 .wave i{
-  flex:1;height:12%;border-radius:99px;
-  background:linear-gradient(180deg,var(--cyan),rgba(138,212,239,.4));
-  opacity:.45;
+  flex:1;height:14%;border-radius:99px;
+  background:linear-gradient(180deg,var(--cyan),rgba(138,212,239,.45));
+  opacity:.5;
+  min-height:3px;
 }
-.player.playing .wave i{animation:wave var(--d) ease-in-out infinite alternate;opacity:.9}
+.player.playing .wave i{
+  animation:wave var(--d) ease-in-out infinite alternate;
+  opacity:.95;
+}
 
 .progress{
   display:grid;grid-template-columns:38px minmax(0,1fr) 38px;
@@ -234,7 +239,7 @@ body.is-playing .links{
   max-height:0;opacity:0;transform:translateY(-10px);margin:0;pointer-events:none;
 }
 body.is-playing .hero-rose{transform:scale(.84,.7);opacity:.7}
-body.is-playing .hero-angy{opacity:.5}
+body.is-playing .hero-angy{opacity:.55}
 body.is-playing .hero-build{opacity:.4}
 
 .player.expanded{
@@ -259,12 +264,12 @@ body.is-playing .hero-build{opacity:.4}
 /* Telegram WebView — lighter */
 body.tg-webview .bg-img{opacity:.32;filter:brightness(.5) saturate(.5)}
 body.tg-webview .bg-eyes{display:none}
-body.tg-webview .hero-angy,
-body.tg-webview .hero-build{display:none}
 body.tg-webview .player{background:rgba(12,24,42,.78)}
 body.tg-webview .links a{background:rgba(18,34,58,.7)}
-body.tg-webview .wave i{animation:none!important}
-body.tg-webview .player.playing .wave i{opacity:.7}
+body.tg-webview .hero-angy{opacity:0}
+body.tg-webview.is-playing .hero-angy{opacity:.4}
+body.tg-webview .hero-build{opacity:0}
+body.tg-webview.is-playing .hero-build{opacity:.3}
 
 /* mobile */
 @media(max-width:600px){
@@ -308,8 +313,8 @@ body.tg-webview .player.playing .wave i{opacity:.7}
 <main class="page">
   <header class="hero">
     <img class="hero-rose" src="rose.jpg" alt="" loading="eager" decoding="async">
-    <img class="hero-angy" src="angy.jpg" alt="" loading="lazy" decoding="async">
-    <img class="hero-build" src="build.jpg" alt="" loading="lazy" decoding="async">
+    <img class="hero-angy" src="angy.jpg" alt="" decoding="async">
+    <img class="hero-build" src="build.jpg" alt="" decoding="async">
     <div class="hero-overlay"></div>
     <div class="hero-bottom"></div>
     <div class="hero-name">
@@ -390,10 +395,10 @@ body.tg-webview .player.playing .wave i{opacity:.7}
         wave=document.getElementById('wave');
 
   // fewer bars in Telegram / mobile
-  const bars = isTG || matchMedia('(max-width:600px)').matches ? 10 : 16;
+  const bars = isTG || matchMedia('(max-width:600px)').matches ? 12 : 18;
   for(let i=0;i<bars;i++){
     const b=document.createElement('i');
-    b.style.setProperty('--h',20+Math.random()*70+'%');
+    b.style.setProperty('--h',25+Math.random()*75+'%');
     b.style.setProperty('--d',1+Math.random()+'s');
     wave.appendChild(b);
   }
