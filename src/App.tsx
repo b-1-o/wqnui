@@ -192,6 +192,7 @@ function Background({ playing, bgIndex }: { playing: boolean; bgIndex: number })
   );
 }
 
+/** Same UX as Bio: expand height, show image + go link */
 function PortalLink({
   link,
   armed,
@@ -208,7 +209,7 @@ function PortalLink({
       className={`portal-shell ${armed ? "armed" : ""}`}
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div className="portal-card glass">
+      <div className="portal-card glass" onPointerDown={(e) => e.stopPropagation()}>
         <div className="portal-face">
           <span className="portal-glyph">{link.glyph}</span>
           <span className="portal-label">{link.label}</span>
@@ -326,7 +327,10 @@ export default function App() {
       setLyricsOpen(false);
     };
     const onPlay = () => setPlaying(true);
-    const onPause = () => setPlaying(false);
+    const onPause = () => {
+      setPlaying(false);
+      setLyricsOpen(false); // collapse lyrics on pause
+    };
 
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("loadedmetadata", onMeta);
@@ -370,6 +374,7 @@ export default function App() {
     } else {
       audio.pause();
       setPlaying(false);
+      setLyricsOpen(false);
     }
   }, [setupAudio]);
 
@@ -397,7 +402,6 @@ export default function App() {
   const expanded = playing || lyricsOpen;
   const portalOpen = armedLink !== null;
 
-  // Click player while portal open → close portal, restore player
   const onPlayerPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
     if (portalOpen) setArmedLink(null);
